@@ -1,0 +1,728 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аренда офисов в Самаре</title>
+    <style>
+        /* Стили для всплывающего окна */
+        .chat-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateY(150%);
+            transition: transform 0.4s ease-out;
+            font-family: 'Open Sans', sans-serif;
+            overflow: hidden;
+        }
+        
+        .chat-popup.visible {
+            transform: translateY(0);
+        }
+        
+        .chat-header {
+            background: #383838;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .manager-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #E9B0B0;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .manager-info {
+            flex-grow: 1;
+        }
+        
+        .manager-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .manager-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        .chat-body {
+            padding: 15px;
+        }
+        
+        .manager-message {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .manager-message:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 20px;
+            border-width: 10px 0 0 10px;
+            border-style: solid;
+            border-color: #f5f5f5 transparent;
+        }
+        
+        .user-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+        
+        .send-btn {
+            background: #383838;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            float: right;
+        }
+        
+        .send-btn:hover {
+            background: #E9B0B0;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #383838;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+<div data-layer="2. Для проекта" style="width: 1920px; height: 6930px; position: relative; background: white; overflow: hidden">
+  <div data-layer="iconlogo" class="Iconlogo" style="width: 117px; height: 22px; left: 154px; top: 6616px; position: absolute; overflow: hidden">
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 0.71px; top: 6.13px; position: absolute">
+      <svg width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9.44303 3.57584C8.30436 3.59451 7.28703 3.81851 6.39103 4.24788C5.49503 4.65848 4.85103 5.28388 4.45903 6.12388V14.9999H0.707031V0.327836H4.15103V3.46384C4.41236 2.95984 4.72036 2.51184 5.07503 2.11984C5.4297 1.70917 5.81236 1.35451 6.22303 1.05584C6.6337 0.757166 7.04436 0.533166 7.45503 0.383836C7.88436 0.215836 8.29503 0.131836 8.68703 0.131836C8.89237 0.131836 9.0417 0.131836 9.13503 0.131836C9.24703 0.131836 9.3497 0.141166 9.44303 0.159836V3.57584Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 10.15px; top: 6.08px; position: absolute">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.88095 15.2802C6.70495 15.2802 5.64095 15.0842 4.68895 14.6922C3.73695 14.2815 2.92495 13.7308 2.25295 13.0402C1.58095 12.3495 1.05825 11.5468 0.684955 10.6322C0.330255 9.71751 0.152954 8.75621 0.152954 7.74821C0.152954 6.70281 0.330255 5.72281 0.684955 4.80821C1.03955 3.87484 1.55295 3.06283 2.22495 2.37217C2.89695 1.66283 3.70895 1.10284 4.66095 0.692172C5.63155 0.281502 6.71425 0.0761719 7.90895 0.0761719C9.10355 0.0761719 10.1676 0.281502 11.101 0.692172C12.053 1.10284 12.8556 1.6535 13.509 2.34417C14.181 3.03484 14.685 3.8375 15.021 4.75221C15.3756 5.66681 15.553 6.61881 15.553 7.60821C15.553 7.85081 15.5436 8.08421 15.525 8.30821C15.525 8.53221 15.5063 8.71881 15.469 8.86821H4.12895C4.18495 9.44681 4.32495 9.96021 4.54895 10.4082C4.77295 10.8562 5.06225 11.2388 5.41695 11.5562C5.77155 11.8735 6.17295 12.1162 6.62095 12.2842C7.06895 12.4522 7.53555 12.5362 8.02096 12.5362C8.76756 12.5362 9.46755 12.3588 10.121 12.0042C10.793 11.6308 11.2503 11.1455 11.493 10.5482L14.713 11.4442C14.1716 12.5642 13.3036 13.4882 12.109 14.2162C10.933 14.9255 9.52355 15.2802 7.88095 15.2802ZM11.689 6.43221C11.5956 5.33081 11.185 4.45351 10.457 3.80017C9.74755 3.12817 8.87955 2.79217 7.85295 2.79217C7.34895 2.79217 6.87295 2.8855 6.42495 3.07217C5.99555 3.24017 5.61295 3.48284 5.27695 3.80017C4.94095 4.11751 4.66095 4.50021 4.43695 4.94821C4.23155 5.39621 4.11025 5.89081 4.07295 6.43221H11.689Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 28.12px; top: 6.08px; position: absolute">
+      <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13.7547 15.0002H10.0027V6.76821C10.0027 5.59221 9.79735 4.73351 9.38665 4.19221C8.97595 3.65083 8.40665 3.38017 7.67865 3.38017C7.30535 3.38017 6.92265 3.45484 6.53065 3.60417C6.13865 3.7535 5.76535 3.96817 5.41065 4.24821C5.07465 4.50951 4.76665 4.82681 4.48665 5.20021C4.20665 5.57351 4.00135 5.98421 3.87065 6.43221V15.0002H0.118652V0.328172H3.50665V3.04417C4.04795 2.11084 4.83195 1.38284 5.85865 0.860172C6.88535 0.337502 8.04265 0.0761719 9.33065 0.0761719C10.2454 0.0761719 10.992 0.244172 11.5707 0.580172C12.1494 0.916172 12.5974 1.35484 12.9147 1.89617C13.232 2.4375 13.4467 3.0535 13.5587 3.74417C13.6894 4.43481 13.7547 5.13481 13.7547 5.84421V15.0002Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 44.07px; top: 1.57px; position: absolute">
+      <svg width="10" height="21" viewBox="0 0 10 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9.95236 19.2439C9.44836 19.4679 8.83236 19.6919 8.10436 19.9159C7.37636 20.1399 6.61106 20.2519 5.80836 20.2519C5.28566 20.2519 4.79106 20.1865 4.32436 20.0559C3.87636 19.9252 3.47506 19.7199 3.12036 19.4399C2.78436 19.1412 2.51366 18.7679 2.30836 18.3199C2.10306 17.8532 2.00036 17.2932 2.00036 16.6399V8.21187H0.0683594V5.32787H2.00036V0.567871H5.75236V5.32787H8.83236V8.21187H5.75236V15.3799C5.75236 15.9025 5.88306 16.2759 6.14436 16.4999C6.42436 16.7052 6.76036 16.8079 7.15236 16.8079C7.54436 16.8079 7.92706 16.7425 8.30036 16.6119C8.67366 16.4812 8.97236 16.3692 9.19636 16.2759L9.95236 19.2439Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 56.19px; top: 0.56px; position: absolute">
+      <svg width="4" height="21" viewBox="0 0 4 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.186401 21.0001V6.32806H3.9384V21.0001H0.186401ZM0.186401 4.28406V0.560059H3.9384V4.28406H0.186401Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 62.76px; top: 0.98px; position: absolute">
+      <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.4511 21.14C8.99506 21.14 7.66976 20.86 6.47506 20.3C5.29906 19.7213 4.28177 18.9653 3.42307 18.032C2.58307 17.08 1.92976 15.9973 1.46306 14.784C0.996462 13.5706 0.763062 12.3293 0.763062 11.06C0.763062 9.73465 1.00576 8.46531 1.49106 7.25198C1.99506 6.03864 2.67646 4.96531 3.53506 4.03198C4.41246 3.09865 5.44846 2.36131 6.64306 1.81998C7.83776 1.25998 9.13507 0.97998 10.5351 0.97998C11.9725 0.97998 13.2791 1.27865 14.4551 1.87598C15.6498 2.45465 16.6671 3.21998 17.5071 4.17198C18.3471 5.12398 19.0005 6.20665 19.4671 7.41998C19.9338 8.63331 20.1671 9.86531 20.1671 11.116C20.1671 12.4413 19.9245 13.7106 19.4391 14.924C18.9538 16.1186 18.2818 17.1826 17.4231 18.116C16.5645 19.0306 15.5378 19.768 14.3431 20.328C13.1485 20.8693 11.8511 21.14 10.4511 21.14ZM4.68306 11.06C4.68306 11.9186 4.81377 12.7493 5.07507 13.552C5.33647 14.3546 5.70976 15.064 6.19506 15.68C6.69906 16.296 7.30576 16.7906 8.01506 17.164C8.74306 17.5373 9.56446 17.724 10.4791 17.724C11.4125 17.724 12.2338 17.5373 12.9431 17.164C13.6711 16.772 14.2778 16.2586 14.7631 15.624C15.2671 14.9893 15.6405 14.28 15.8831 13.496C16.1445 12.6933 16.2751 11.8813 16.2751 11.06C16.2751 10.2013 16.1351 9.37064 15.8551 8.56798C15.5938 7.76531 15.2111 7.05598 14.7071 6.43998C14.2218 5.82398 13.6151 5.33864 12.8871 4.98398C12.1778 4.61065 11.3751 4.42398 10.4791 4.42398C9.54576 4.42398 8.71506 4.61998 7.98706 5.01198C7.25906 5.38531 6.65246 5.88931 6.16706 6.52398C5.68176 7.13998 5.30846 7.84931 5.04706 8.65198C4.80446 9.43598 4.68306 10.2386 4.68306 11.06Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 85.05px; top: 6.08px; position: absolute">
+      <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13.6832 15.0002H9.93124V6.76821C9.93124 5.59221 9.72594 4.73351 9.31524 4.19221C8.90454 3.65083 8.33524 3.38017 7.60724 3.38017C7.23394 3.38017 6.85124 3.45484 6.45924 3.60417C6.06724 3.7535 5.69394 3.96817 5.33924 4.24821C5.00324 4.50951 4.69524 4.82681 4.41524 5.20021C4.13524 5.57351 3.92994 5.98421 3.79924 6.43221V15.0002H0.0472412V0.328172H3.43524V3.04417C3.97654 2.11084 4.76054 1.38284 5.78724 0.860172C6.81394 0.337502 7.97124 0.0761719 9.25924 0.0761719C10.1739 0.0761719 10.9205 0.244172 11.4992 0.580172C12.0779 0.916172 12.5259 1.35484 12.8432 1.89617C13.1605 2.4375 13.3752 3.0535 13.4872 3.74417C13.6179 4.43481 13.6832 5.13481 13.6832 5.84421V15.0002Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 101.30px; top: 6.08px; position: absolute">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8.03 15.2802C6.854 15.2802 5.79 15.0842 4.838 14.6922C3.886 14.2815 3.074 13.7308 2.402 13.0402C1.73 12.3495 1.207 11.5468 0.834 10.6322C0.479 9.71751 0.302002 8.75621 0.302002 7.74821C0.302002 6.70281 0.479 5.72281 0.834 4.80821C1.188 3.87484 1.702 3.06283 2.374 2.37217C3.046 1.66283 3.858 1.10284 4.81 0.692172C5.78 0.281502 6.863 0.0761719 8.058 0.0761719C9.252 0.0761719 10.316 0.281502 11.25 0.692172C12.202 1.10284 13.004 1.6535 13.658 2.34417C14.33 3.03484 14.834 3.8375 15.17 4.75221C15.524 5.66681 15.702 6.61881 15.702 7.60821C15.702 7.85081 15.692 8.08421 15.674 8.30821C15.674 8.53221 15.655 8.71881 15.618 8.86821H4.278C4.334 9.44681 4.474 9.96021 4.698 10.4082C4.922 10.8562 5.211 11.2388 5.566 11.5562C5.92 11.8735 6.322 12.1162 6.77 12.2842C7.218 12.4522 7.684 12.5362 8.17 12.5362C8.916 12.5362 9.616 12.3588 10.27 12.0042C10.942 11.6308 11.399 11.1455 11.642 10.5482L14.862 11.4442C14.32 12.5642 13.452 13.4882 12.258 14.2162C11.082 14.9255 9.672 15.2802 8.03 15.2802ZM11.838 6.43221C11.744 5.33081 11.334 4.45351 10.606 3.80017C9.896 3.12817 9.028 2.79217 8.002 2.79217C7.498 2.79217 7.022 2.8855 6.574 3.07217C6.144 3.24017 5.762 3.48284 5.426 3.80017C5.09 4.11751 4.81 4.50021 4.586 4.94821C4.38 5.39621 4.259 5.89081 4.222 6.43221H11.838Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 101.50px; top: 0px; position: absolute">
+      <svg width="16" height="3" viewBox="0 0 16 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.5 0H15.5V3H0.5V0Z" fill="#383838"/>
+      </svg>
+    </div>
+  </div>
+  <div data-layer="Frame 1" class="Frame1" style="height: 42px; left: 639px; top: 6620px; position: absolute; justify-content: flex-start; align-items: flex-start; gap: 60px; display: inline-flex">
+    <a href="Пофис.html" data-layer="Популярные офисы" style="display: inline-block; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; text-decoration: none; margin-right: 20px;">Популярные офисы</a>
+<a href="онас.html" data-layer="О компании" style="display: inline-block; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; text-decoration: none; margin-right: 20px;">О компании</a>
+<a href="#office-showreel" 
+   onclick="smoothScroll(event)" 
+   data-layer="Шоурил офисов" 
+   style="display: inline-block; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; text-decoration: none; margin-right: 20px;">
+  Шоурил офисов
+</a><a href="контакт.html" data-layer="Контакты" style="display: inline-block; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; text-decoration: none;">Контакты</a>
+  </div>
+  <div data-layer="Frame 2" class="Frame2" style="height: 42px; left: 1545px; top: 6609px; position: absolute; background: white; justify-content: flex-start; align-items: flex-start; gap: 60px; display: inline-flex">
+    <div data-layer="8 800 010 88 12" class="8000108812" style="text-align: right; color: #383838; font-size: 30px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.30px; word-wrap: break-word">8 800 010 88 12</div>
+  </div>
+  <div data-layer="Бесплатная линия" style="left: 1624px; top: 6637px; position: absolute; opacity: 0.50; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word">Бесплатная линия</div>
+  <div data-svg-wrapper data-layer="iconVK" class="Iconvk" style="left: 167px; top: 6708px; position: absolute">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.8939 15.8373C20.8697 15.7824 20.8471 15.7369 20.8261 15.7003C20.4791 15.0432 19.8161 14.2364 18.8372 13.2801L18.8165 13.2581L18.8063 13.2475L18.7957 13.2364H18.7852C18.3409 12.7911 18.0596 12.4916 17.9418 12.3384C17.7264 12.0463 17.678 11.7507 17.7958 11.4512C17.8791 11.2249 18.1917 10.747 18.733 10.0168C19.0177 9.62986 19.2432 9.31972 19.4098 9.08606C20.6109 7.40686 21.1316 6.33383 20.9719 5.86655L20.9098 5.75735C20.8681 5.69161 20.7605 5.63147 20.5871 5.57662C20.4134 5.52189 20.1913 5.51284 19.9206 5.54931L16.9217 5.57109C16.8731 5.55299 16.8036 5.55468 16.7133 5.57662C16.6231 5.59856 16.5779 5.60956 16.5779 5.60956L16.5257 5.63699L16.4843 5.66994C16.4495 5.69173 16.4113 5.73004 16.3696 5.78482C16.3281 5.83939 16.2936 5.90345 16.2657 5.97643C15.9392 6.85979 15.5681 7.6811 15.1514 8.4403C14.8946 8.89301 14.6587 9.28535 14.4433 9.6175C14.228 9.94965 14.0475 10.1943 13.9018 10.3512C13.7559 10.5081 13.6243 10.6339 13.506 10.7289C13.3881 10.824 13.298 10.864 13.2355 10.8493C13.1729 10.8348 13.1141 10.8202 13.0583 10.8056C12.9612 10.7398 12.883 10.6504 12.8241 10.5372C12.765 10.4241 12.7251 10.2817 12.7044 10.1101C12.6835 9.93841 12.6714 9.79076 12.6679 9.6666C12.6646 9.54267 12.6661 9.36725 12.6732 9.14094C12.6804 8.91453 12.6835 8.76133 12.6835 8.68103C12.6835 8.40356 12.6887 8.10243 12.699 7.77757C12.7096 7.45269 12.7181 7.1953 12.7251 7.00566C12.7322 6.81583 12.7355 6.61502 12.7355 6.4033C12.7355 6.19157 12.7232 6.02553 12.699 5.90502C12.6752 5.78466 12.6384 5.66783 12.59 5.55457C12.5413 5.44142 12.4701 5.35389 12.3766 5.29175C12.2829 5.2297 12.1663 5.18045 12.0277 5.14386C11.6598 5.05629 11.1911 5.00892 10.6218 5.00156C9.33065 4.98698 8.50102 5.07466 8.13308 5.26449C7.9873 5.34469 7.85538 5.45427 7.73743 5.59288C7.61244 5.75355 7.59501 5.84124 7.68524 5.85565C8.10183 5.92128 8.39674 6.07827 8.57032 6.32647L8.63287 6.45799C8.68152 6.55287 8.7301 6.72088 8.77872 6.96174C8.82726 7.20261 8.8586 7.46907 8.87237 7.76095C8.90703 8.29397 8.90703 8.75025 8.87237 9.12982C8.83762 9.50949 8.8048 9.80512 8.77347 10.0169C8.74214 10.2286 8.6953 10.4002 8.63287 10.5316C8.57032 10.6629 8.5287 10.7432 8.50784 10.7724C8.487 10.8016 8.46965 10.82 8.45586 10.8271C8.36563 10.8635 8.27179 10.882 8.17466 10.882C8.07739 10.882 7.95944 10.8309 7.82062 10.7285C7.68185 10.6263 7.53783 10.4859 7.38853 10.307C7.23925 10.128 7.07091 9.87806 6.88339 9.55682C6.69603 9.23564 6.50163 8.85603 6.30031 8.41802L6.13374 8.10036C6.02961 7.896 5.88737 7.59844 5.70687 7.20795C5.52626 6.8173 5.36662 6.43942 5.22784 6.07439C5.17236 5.92108 5.08902 5.80437 4.97797 5.72405L4.92586 5.6911C4.8912 5.66196 4.83558 5.63101 4.75928 5.59802C4.68288 5.56507 4.60314 5.54145 4.51977 5.52691L1.66657 5.5487C1.37501 5.5487 1.17718 5.61816 1.07302 5.75689L1.03133 5.82252C1.0105 5.85906 1 5.91744 1 5.9978C1 6.07812 1.02083 6.17669 1.06251 6.2934C1.47903 7.32287 1.93198 8.31569 2.42137 9.27203C2.91076 10.2284 3.33602 10.9988 3.69691 11.5825C4.05788 12.1666 4.42582 12.7179 4.80071 13.236C5.17561 13.7544 5.42377 14.0866 5.54519 14.2326C5.66675 14.3788 5.76223 14.4881 5.83163 14.561L6.09202 14.8238C6.25862 14.9991 6.50327 15.209 6.8261 15.4535C7.14898 15.6981 7.50645 15.939 7.89868 16.1765C8.29096 16.4135 8.74736 16.6069 9.26806 16.7566C9.78871 16.9064 10.2955 16.9665 10.7884 16.9375H11.986C12.2288 16.9154 12.4128 16.8352 12.5378 16.6966L12.5792 16.6417C12.6072 16.598 12.6332 16.5304 12.6573 16.4392C12.6816 16.3481 12.6937 16.2475 12.6937 16.1382C12.6866 15.8243 12.7094 15.5413 12.7614 15.2896C12.8132 15.0378 12.8723 14.848 12.9385 14.7201C13.0047 14.5924 13.0792 14.4846 13.1623 14.3972C13.2456 14.3097 13.3049 14.2567 13.3397 14.2385C13.3742 14.2201 13.4018 14.2076 13.4227 14.2C13.5892 14.1417 13.7853 14.1983 14.0112 14.37C14.2368 14.5415 14.4486 14.7533 14.6465 15.0051C14.8444 15.2571 15.0821 15.5399 15.3596 15.8537C15.6375 16.1677 15.8804 16.4011 16.0885 16.5546L16.2968 16.686C16.4359 16.7736 16.6163 16.854 16.8386 16.927C17.0604 17 17.2547 17.0183 17.4214 16.9817L20.0871 16.938C20.3509 16.938 20.556 16.8921 20.7014 16.801C20.8473 16.7097 20.934 16.6092 20.9618 16.4999C20.9898 16.3905 20.9912 16.2662 20.9671 16.1274C20.9424 15.9888 20.9181 15.892 20.8939 15.8373Z" fill="#C3C3C3"/>
+    </svg>
+  </div>
+  <div data-svg-wrapper data-layer="iconYoutube" class="Iconyoutube" style="left: 210px; top: 6708px; position: absolute">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.2204 5.28765C19.4985 4.37306 18.1656 4 15.6201 4H6.37975C3.77594 4 2.42045 4.39713 1.70123 5.37083C1 6.3202 1 7.71903 1 9.65503V13.345C1 17.0957 1.832 19 6.37975 19H15.6201C17.8276 19 19.0508 18.6709 19.8422 17.8637C20.6538 17.036 21 15.6847 21 13.345V9.65503C21 7.61335 20.9458 6.20628 20.2204 5.28765ZM13.8401 12.0095L9.64406 14.3465C9.55026 14.3988 9.44767 14.4247 9.34522 14.4247C9.22922 14.4247 9.11348 14.3914 9.01097 14.3253C8.81794 14.2006 8.70006 13.9777 8.70006 13.7371V9.07803C8.70006 8.83794 8.81761 8.61518 9.01026 8.49045C9.20297 8.36574 9.44264 8.35721 9.64258 8.4679L13.8386 10.7899C14.0521 10.908 14.1861 11.1429 14.1864 11.3991C14.1867 11.6556 14.0533 11.8908 13.8401 12.0095Z" fill="#C3C3C3"/>
+    </svg>
+  </div>
+  <div data-layer="Rectangle 5" class="Rectangle5" style="width: 1920px; height: 110px; left: 0px; top: 6820px; position: absolute; background: #F2F2F2"></div>
+  <div data-layer="Rectangle 6" class="Rectangle6" style="width: 1920px; height: 110px; left: 0px; top: 6820px; position: absolute; background: #F2F2F2"></div>
+  <div data-layer="Политика конфиденциальности" style="left: 151px; top: 6861px; position: absolute; opacity: 0.50; color: #383838; font-size: 15px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.15px; word-wrap: break-word">Политика конфиденциальности</div>
+  <div data-layer="Обработка персональных данных" style="left: 427px; top: 6861px; position: absolute; opacity: 0.50; color: #383838; font-size: 15px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.15px; word-wrap: break-word">Обработка персональных данных</div>
+  <img data-layer="image 4" class="Image4" style="width: 636px; height: 1145px; left: 150px; top: 5147px; position: absolute" src="заявка.jpg" />
+  <div data-svg-wrapper data-layer="Vector 3" class="Vector3" style="left: 427px; top: 4877px; position: absolute">
+    <svg width="834" height="1666" viewBox="0 0 834 1666" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M795.807 770.701C683.307 265.285 53.4624 20.234 0 0.871582L422.789 1665.14C761.711 1402.83 908.307 1276.12 795.807 770.701Z" fill="white"/>
+    </svg>
+  </div>
+  <div data-svg-wrapper data-layer="Vector 4" class="Vector4" style="left: 358px; top: 4922px; position: absolute">
+    <svg width="834" height="1666" viewBox="0 0 834 1666" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path opacity="0.5" d="M795.807 770.701C683.307 265.285 53.4624 20.234 0 0.871582L422.789 1665.14C761.711 1402.83 908.307 1276.12 795.807 770.701Z" fill="white"/>
+    </svg>
+  </div>
+
+  <div data-layer="iconlogo" class="Iconlogo" style="width: 707px; height: 133px; left: 917px; top: 6091px; position: absolute; overflow: hidden">
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 4.27px; top: 37.07px; position: absolute">
+      <svg width="54" height="90" viewBox="0 0 54 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M53.0617 20.8918C46.181 21.0047 40.0336 22.3589 34.6193 24.9546C29.205 27.4369 25.3135 31.2177 22.9447 36.2959V89.9553H0.2724V1.2562H21.0836V20.2147C22.6627 17.1678 24.5239 14.4595 26.6671 12.0897C28.8102 9.60697 31.1225 7.46288 33.6041 5.65729C36.0857 3.85169 38.5672 2.49751 41.0488 1.59474C43.6431 0.579106 46.1247 0.0712891 48.4934 0.0712891C49.7342 0.0712891 50.6366 0.0712891 51.2006 0.0712891C51.8773 0.0712891 52.4978 0.127692 53.0617 0.240561V20.8918Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 61.35px; top: 36.73px; position: absolute">
+      <svg width="94" height="93" viewBox="0 0 94 93" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M47.0495 92.6478C39.9433 92.6478 33.5138 91.4629 27.7611 89.093C22.0084 86.6102 17.1017 83.2809 13.041 79.1059C8.98029 74.9303 5.82175 70.0777 3.566 64.5485C1.42264 59.0187 0.351257 53.2072 0.351257 47.1134C0.351257 40.7935 1.42264 34.8689 3.566 29.3398C5.70875 23.6971 8.81109 18.7881 12.8718 14.6128C16.9325 10.3245 21.8392 6.93911 27.5919 4.45642C33.457 1.97374 39.9995 0.732422 47.2187 0.732422C54.4374 0.732422 60.8668 1.97374 66.5071 4.45642C72.2598 6.93911 77.1097 10.2681 81.058 14.4435C85.1187 18.6189 88.1643 23.4714 90.1946 29.0012C92.3374 34.5304 93.4094 40.2857 93.4094 46.267C93.4094 47.7337 93.3526 49.1447 93.2402 50.4988C93.2402 51.853 93.1272 52.9811 92.9018 53.8843H24.3772C24.7156 57.3822 25.5615 60.4859 26.9151 63.1943C28.2687 65.9027 30.0169 68.2157 32.1602 70.1345C34.303 72.0527 36.7285 73.5199 39.4357 74.5356C42.1428 75.5512 44.9624 76.059 47.8955 76.059C52.407 76.059 56.6369 74.9866 60.5852 72.8429C64.646 70.5855 67.4093 67.6516 68.8759 64.0407L88.3335 69.4574C85.0619 76.2283 79.8168 81.8143 72.5982 86.2154C65.4919 90.5034 56.9753 92.6478 47.0495 92.6478ZM70.0602 39.1576C69.4959 32.4991 67.0147 27.1954 62.6156 23.2457C58.3289 19.1832 53.0838 17.1519 46.8803 17.1519C43.8348 17.1519 40.9584 17.7161 38.2513 18.8446C35.6565 19.8602 33.3446 21.3273 31.3142 23.2457C29.2839 25.1642 27.5919 27.4778 26.2383 30.1861C24.9972 32.8945 24.2642 35.8846 24.0388 39.1576H70.0602Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 169.91px; top: 36.73px; position: absolute">
+      <svg width="84" height="91" viewBox="0 0 84 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M83.312 90.955H60.6397V41.1888C60.6397 34.0794 59.3991 28.8882 56.9173 25.6158C54.4356 22.3429 50.9955 20.7066 46.5963 20.7066C44.3406 20.7066 42.028 21.158 39.6593 22.0608C37.2905 22.9636 35.0348 24.2613 32.8914 25.9543C30.8611 27.534 28.9999 29.4522 27.3079 31.7096C25.616 33.9663 24.3754 36.4492 23.5856 39.1576V90.955H0.913269V2.25588H21.386V18.6753C24.657 13.0329 29.3945 8.63184 35.5986 5.47206C41.8026 2.31228 48.7959 0.732422 56.5789 0.732422C62.1062 0.732422 66.6177 1.74806 70.1147 3.77933C73.6116 5.8106 76.3187 8.46256 78.2361 11.7352C80.1535 15.0077 81.4508 18.7317 82.1276 22.9071C82.9174 27.0824 83.312 31.3142 83.312 35.6028V90.955Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 266.29px; top: 9.48px; position: absolute">
+      <svg width="61" height="120" viewBox="0 0 61 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60.0195 113.385C56.974 114.739 53.2516 116.093 48.8525 117.447C44.4534 118.801 39.8289 119.478 34.9784 119.478C31.8199 119.478 28.8311 119.083 26.011 118.294C23.3038 117.503 20.8789 116.262 18.7355 114.57C16.7052 112.764 15.0694 110.507 13.8288 107.799C12.5883 104.977 11.9677 101.592 11.9677 97.6423V46.6909H0.293091V29.2559H11.9677V0.479492H34.64V29.2559H53.2516V46.6909H34.64V90.025C34.64 93.1844 35.4298 95.4417 37.0088 96.7959C38.7007 98.037 40.7311 98.6579 43.0998 98.6579C45.4686 98.6579 47.7811 98.2625 50.0369 97.473C52.2927 96.6829 54.0976 96.0058 55.4512 95.4417L60.0195 113.385Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 339.52px; top: 3.39px; position: absolute">
+      <svg width="24" height="124" viewBox="0 0 24 124" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.519531 123.955V35.2559H23.1919V123.955H0.519531ZM0.519531 22.899V0.385742H23.1919V22.899H0.519531Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 379.26px; top: 5.92px; position: absolute">
+      <svg width="118" height="123" viewBox="0 0 118 123" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M58.8028 122.801C50.0046 122.801 41.9961 121.109 34.7768 117.723C27.6706 114.225 21.5233 109.654 16.3344 104.012C11.2585 98.2569 7.31081 91.7115 4.49066 84.3765C1.67112 77.041 0.260742 69.5367 0.260742 61.8632C0.260742 53.8508 1.72732 46.177 4.65986 38.8419C7.7054 31.5067 11.8229 25.018 17.0112 19.3755C22.3131 13.7331 28.5734 9.27558 35.792 6.003C43.0113 2.61754 50.8505 0.924805 59.3104 0.924805C67.9962 0.924805 75.8916 2.73041 82.9979 6.34154C90.2171 9.83987 96.3644 14.4666 101.44 20.2219C106.516 25.9772 110.465 32.5224 113.284 39.8575C116.104 47.1927 117.514 54.6407 117.514 62.2018C117.514 70.2138 116.048 77.8873 113.115 85.2229C110.182 92.4448 106.122 98.8771 100.933 104.52C95.7444 110.049 89.5404 114.507 82.3211 117.893C75.1024 121.165 67.2626 122.801 58.8028 122.801ZM23.9483 61.8632C23.9483 67.0539 24.7381 72.0758 26.317 76.9285C27.8966 81.7806 30.1523 86.0692 33.0849 89.7932C36.1304 93.5172 39.7965 96.5073 44.0826 98.7647C48.4818 101.021 53.4453 102.15 58.972 102.15C64.6123 102.15 69.5751 101.021 73.8613 98.7647C78.2604 96.3949 81.9265 93.2911 84.859 89.4547C87.9046 85.6176 90.1609 81.3296 91.6269 76.59C93.2065 71.7373 93.9957 66.8284 93.9957 61.8632C93.9957 56.672 93.1497 51.6502 91.4577 46.7977C89.8788 41.9452 87.5662 37.657 84.5206 33.933C81.5881 30.209 77.922 27.2749 73.5229 25.1308C69.2368 22.8739 64.3863 21.7454 58.972 21.7454C53.3323 21.7454 48.3126 22.9303 43.9135 25.3001C39.5143 27.557 35.8488 30.6039 32.9157 34.4408C29.9831 38.1648 27.7274 42.453 26.1478 47.3055C24.6818 52.0452 23.9483 56.8975 23.9483 61.8632Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 513.92px; top: 36.73px; position: absolute">
+      <svg width="84" height="91" viewBox="0 0 84 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M83.3164 90.955H60.6441V41.1888C60.6441 34.0794 59.4035 28.8882 56.9218 25.6158C54.44 22.3429 50.9999 20.7066 46.6008 20.7066C44.345 20.7066 42.0325 21.158 39.6637 22.0608C37.295 22.9636 35.0392 24.2613 32.8959 25.9543C30.8655 27.534 29.0043 29.4522 27.3124 31.7096C25.6204 33.9663 24.3798 36.4492 23.5901 39.1576V90.955H0.917725V2.25588H21.3905V18.6753C24.6614 13.0329 29.3989 8.63184 35.603 5.47206C41.8071 2.31228 48.8003 0.732422 56.5834 0.732422C62.1107 0.732422 66.6222 1.74806 70.1191 3.77933C73.616 5.8106 76.3232 8.46256 78.2405 11.7352C80.1579 15.0077 81.4553 18.7317 82.132 22.9071C82.9218 27.0824 83.3164 31.3142 83.3164 35.6028V90.955Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 612.14px; top: 36.73px; position: absolute">
+      <svg width="94" height="93" viewBox="0 0 94 93" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M46.8394 92.6478C39.7332 92.6478 33.3037 91.4629 27.551 89.093C21.7983 86.6102 16.8916 83.2809 12.8309 79.1059C8.77019 74.9303 5.60984 70.0777 3.3559 64.5485C1.21072 59.0187 0.141174 53.2072 0.141174 47.1134C0.141174 40.7935 1.21072 34.8689 3.3559 29.3398C5.49502 23.6971 8.601 18.7881 12.6617 14.6128C16.7224 10.3245 21.6291 6.93911 27.3818 4.45642C33.2433 1.97374 39.7875 0.732422 47.0086 0.732422C54.2236 0.732422 60.6531 1.97374 66.297 4.45642C72.0497 6.93911 76.896 10.2681 80.8479 14.4435C84.9086 18.6189 87.9542 23.4714 89.9845 29.0012C92.1237 34.5304 93.1993 40.2857 93.1993 46.267C93.1993 47.7337 93.1389 49.1447 93.0301 50.4988C93.0301 51.853 92.9153 52.9811 92.6917 53.8843H24.1671C24.5055 57.3822 25.3514 60.4859 26.705 63.1943C28.0586 65.9027 29.805 68.2157 31.9501 70.1345C34.0893 72.0527 36.5184 73.5199 39.2256 74.5356C41.9327 75.5512 44.7486 76.059 47.6854 76.059C52.1933 76.059 56.4232 74.9866 60.3751 72.8429C64.4358 70.5855 67.1974 67.6516 68.6658 64.0407L88.1234 69.4574C84.8482 76.2283 79.6031 81.8143 72.3881 86.2154C65.2819 90.5034 56.7616 92.6478 46.8394 92.6478ZM69.8501 39.1576C69.2821 32.4991 66.8046 27.1954 62.4055 23.2457C58.1152 19.1832 52.8701 17.1519 46.6702 17.1519C43.6247 17.1519 40.7483 17.7161 38.0412 18.8446C35.4428 19.8602 33.1345 21.3273 31.1042 23.2457C29.0738 25.1642 27.3818 27.4778 26.0282 30.1861C24.7834 32.8945 24.0523 35.8846 23.8287 39.1576H69.8501Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 613.34px; top: 0px; position: absolute">
+      <svg width="91" height="19" viewBox="0 0 91 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.337585 0H90.9786V18.1364H0.337585V0Z" fill="#383838"/>
+      </svg>
+    </div>
+  </div>
+  
+  <div id="office-showreel" style="width: 1624px; height: 1025px; left: 146px; top: 3551px; position: absolute"></div>
+  <div data-layer="Шоурил офисов" style="left: 150px; top: 3660px; position: absolute; color: #383838; font-size: 50px; font-family: Playfair Display; font-weight: 400; line-height: 60px; word-wrap: break-word">Шоурил офисов</div>
+  <div data-layer="22 объекта в одном видео" style="left: 150px; top: 3640px; position: absolute; opacity: 0.50; color: #383838; font-size: 15px; font-family: Open Sans; font-weight: 400; text-transform: uppercase; letter-spacing: 0.75px; word-wrap: break-word">22 объекта в одном видео</div>
+ <div style="width: 1504px; height: 950px; left: 146px; top: 3751px; position: absolute">
+  <!-- YouTube видео -->
+  <iframe 
+    width="102%"
+    height="91%"
+    src="456480_Timelapse_Time-lapse_1920x1080.mp4"
+    frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen
+    style="object-fit: cover">
+  </iframe>
+
+  <!-- Или HTML5 видео -->
+  <!--  
+  <video width="100%" height="100%" controls style="object-fit: cover">
+    <source src="lalalallalal" type="video/mp4">
+  </video>
+  -->
+</div>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 117.25px; top: 88.50px; position: absolute">
+      <svg width="89" height="118" viewBox="0 0 89 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.24744 1.49829L87.4995 58.9996L1.24744 116.501V1.49829Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+  <div data-layer="Ellipse 2" class="Ellipse2" style="width: 700px; height: 700px; left: 610px; top: 2720px; position: absolute; background: #F2F2F2; border-radius: 9999px"></div>
+<a href="3page.html" 
+   data-layer="Перейти в каталог" 
+   style="left: 980px; 
+          top: 3277px; 
+          position: absolute; 
+          color: #383838; 
+          font-size: 18px; 
+          font-family: Open Sans; 
+          font-weight: 400; 
+          line-height: 24px; 
+          letter-spacing: 0.18px; 
+          text-decoration: none; 
+          cursor: pointer">
+  Перейти в каталог
+</a>
+  <div data-svg-wrapper data-layer="Ellipse 1" class="Ellipse1" style="left: 1232px; top: 3263px; position: absolute">
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="28" r="28" fill="#E9B0B0"/>
+    </svg>
+  </div>
+  <div data-svg-wrapper data-layer="Arrow 1" class="Arrow1" style="left: 1175px; top: 3281px; position: absolute">
+    <svg width="87" height="24" viewBox="0 0 87 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M86.0607 13.0607C86.6464 12.4749 86.6464 11.5251 86.0607 10.9393L76.5147 1.3934C75.9289 0.807611 74.9792 0.807611 74.3934 1.3934C73.8076 1.97919 73.8076 2.92893 74.3934 3.51472L82.8787 12L74.3934 20.4853C73.8076 21.0711 73.8076 22.0208 74.3934 22.6066C74.9792 23.1924 75.9289 23.1924 76.5147 22.6066L86.0607 13.0607ZM0 13.5H85V10.5H0V13.5Z" fill="#383838"/>
+    </svg>
+  </div>
+  <div data-layer="8 лет безупречной репутации" style="width: 491px; height: 125px; left: 942px; top: 2830px; position: absolute; color: #383838; font-size: 50px; font-family: Playfair Display; font-weight: 400; line-height: 60px; word-wrap: break-word">8 лет безупречной репутации
+  <br/></div>
+  <div data-layer="22" style="width: 491px; height: 125px; left: 565px; top: 2830px; position: absolute; color: #383838; font-size: 96px; font-family: Playfair Display; font-weight: 400; line-height: 95px; word-wrap: break-word">22</div>
+  <div data-layer="646" style="width: 491px; height: 125px; left: 568px; top: 3025px; position: absolute; color: #383838; font-size: 96px; font-family: Playfair Display; font-weight: 400; line-height: 95px; word-wrap: break-word">646</div>
+  <div data-layer="О RENTI ONE" class="RentiOne" style="left: 942px; top: 2790px; position: absolute; opacity: 0.50; color: #383838; font-size: 15px; font-family: Open Sans; font-weight: 400; text-transform: uppercase; letter-spacing: 0.75px; word-wrap: break-word">О RENTI ONE  </div>
+  <div data-layer="Мы помогаем предпринимателям найти офисное помещение в Самаре, преимущественно в центральной части города. Среди наших клиентов есть как небольшие стартапы из 4-6 человек, так и крупный бизнес с тысячами сотрудников. Поэтому мы можем помочь любой компании, независимо от масштаба." class="46" style="width: 514px; height: 235px; left: 942px; top: 2968px; position: absolute; color: #383838; font-size: 18px; font-family: Open Sans; font-weight: 400; line-height: 30px; letter-spacing: 0.18px; word-wrap: break-word">Мы помогаем предпринимателям  найти офисное помещение в Самаре, преимущественно в центральной части города.
+  <br/>Среди наших клиентов есть как небольшие стартапы из 4-6 человек, так и крупный бизнес с тысячами сотрудников. Поэтому мы можем помочь любой компании, независимо от масштаба.
+  <br/></div>
+  <div data-layer="Объекта по разным точкам города" style="width: 184px; height: 89px; left: 559px; top: 2931px; position: absolute; color: #383838; font-size: 18px; font-family: Open Sans; font-weight: 400; line-height: 30px; letter-spacing: 0.18px; word-wrap: break-word">Объекта по разным точкам  города  </div>
+  <div data-layer="Действующих арендаторов в Renti One на сегодняшний день" class="RentiOne" style="width: 223px; height: 77px; left: 562px; top: 3126px; position: absolute; color: #383838; font-size: 18px; font-family: Open Sans; font-weight: 400; line-height: 30px; letter-spacing: 0.18px; word-wrap: break-word">Действующих арендаторов в Renti One на сегодняшний день</div>
+  <div data-layer="Популярные офисы" style="left: 150px; top: 1357px; position: absolute; color: #383838; font-size: 50px; font-family: Playfair Display; font-weight: 400; line-height: 60px; word-wrap: break-word">Популярные офисы</div>
+  <div data-layer="АКТУАЛЬНО" style="left: 150px; top: 1317px; position: absolute; opacity: 0.50; color: #383838; font-size: 15px; font-family: Open Sans; font-weight: 400; text-transform: uppercase; letter-spacing: 0.75px; word-wrap: break-word">АКТУАЛЬНО</div>
+  
+<div data-layer="Галактика Газпром Москва Ладья Вертикаль Активный капитал" 
+     style="width: 375px; height: 215px; left: 150px; top: 1430px; position: absolute">
+  <span style="color: #383838; font-size: 32px; font-family: Open Sans; font-weight: 400; line-height: 69.50px; letter-spacing: 0.32px; word-wrap: break-word">
+    <a href="#" style="color: inherit; text-decoration: none">Галактика</a><br/>
+    <a href="#" style="color: inherit; text-decoration: none">Газпром</a><br/>
+    <a href="#" style="color: inherit; text-decoration: none">Москва</a><br/>
+    <a href="#" style="color: inherit; text-decoration: none">Ладья</a><br/>
+    <a href="#" style="color: inherit; text-decoration: none">Вертикаль</a><br/>
+    <a href="#" style="color: inherit; text-decoration: none">Активный капитал</a><br/>
+  </span>
+</div>
+
+
+
+
+  <!-- Контейнер галереи -->
+<div id="galleryBlock" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%">
+  <!-- Блок 1 -->
+  <div class="image-block" data-gallery="1">
+    <img data-layer="img1155-2 1" 
+         style="width: 802px; height: 596px; left: 1118px; top: 1507px; position: absolute; z-index: 1" 
+         src="gallery1-1.jpg">
+  </div>
+
+  <!-- Блок 2 -->
+  <div class="image-block" data-gallery="2">
+    <img data-layer="image 2" 
+         style="width: 488px; height: 983px; left: 587px; top: 1487px; position: absolute; z-index: 1" 
+         src="gallery2-1.jpg">
+  </div>
+
+  <!-- Стрелки -->
+  <div data-svg-wrapper data-layer="Arrow 2" class="gallery-arrow arrow-left" 
+       style="left: 1288px; top: 2223px; position: absolute; cursor: pointer; z-index: 1000; pointer-events: auto">
+    <svg width="35" height="16" viewBox="0 0 35 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path opacity="0.5" d="M0.292892 7.29289C-0.0976295 7.68342 -0.0976295 8.31658 0.292892 8.70711L6.65685 15.0711C7.04738 15.4616 7.68054 15.4616 8.07107 15.0711C8.46159 14.6805 8.46159 14.0474 8.07107 13.6569L2.41422 8L8.07107 2.34315C8.46159 1.95262 8.46159 1.31946 8.07107 0.928932C7.68054 0.538408 7.04738 0.538408 6.65685 0.928932L0.292892 7.29289ZM35 7L1 7V9L35 9V7Z" fill="black"/>
+    </svg>
+  </div>
+
+  <div data-svg-wrapper data-layer="Arrow 3" class="gallery-arrow arrow-right" 
+       style="left: 1355px; top: 2223px; position: absolute; cursor: pointer; z-index: 1000; pointer-events: auto">
+    <svg width="78" height="16" viewBox="0 0 78 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M77.7071 8.70711C78.0976 8.31659 78.0976 7.68342 77.7071 7.2929L71.3431 0.928938C70.9526 0.538414 70.3195 0.538414 69.9289 0.928938C69.5384 1.31946 69.5384 1.95263 69.9289 2.34315L75.5858 8.00001L69.9289 13.6569C69.5384 14.0474 69.5384 14.6805 69.9289 15.0711C70.3195 15.4616 70.9526 15.4616 71.3431 15.0711L77.7071 8.70711ZM-8.74228e-08 9L77 9.00001L77 7.00001L8.74228e-08 7L-8.74228e-08 9Z" fill="#E9B0B0"/>
+    </svg>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Конфигурация для каждого блока
+  const galleries = {
+    1: {
+      images: ['gallery1-1.jpg', 'gallery1-2.jpg', 'gallery1-3.jpg', 'gallery1-4.jpg', 'gallery1-5.jpg', 'gallery1-6.jpg'],
+      index: 0
+    },
+    2: {
+      images: ['gallery2-1.jpg', 'gallery2-2.jpg', 'gallery2-3.jpg', 'gallery2-4.jpg', 'gallery2-5.jpg', 'gallery2-6.jpg'],
+      index: 0
+    }
+  };
+
+  const basePath = '';
+
+  // Явная привязка стрелок
+  const leftArrow = document.querySelector('.arrow-left');
+  const rightArrow = document.querySelector('.arrow-right');
+
+  function updateImages(step) {
+    Object.keys(galleries).forEach(galleryId => {
+      const gallery = galleries[galleryId];
+      gallery.index = (gallery.index + step + gallery.images.length) % gallery.images.length;
+      
+      const img = document.querySelector(`[data-gallery="${galleryId}"] img`);
+      img.style.transition = 'opacity 0.3s';
+      img.style.opacity = '0';
+      
+      setTimeout(() => {
+        img.src = basePath + gallery.images[gallery.index];
+        img.style.opacity = '1';
+      }, 300);
+    });
+  }
+
+  // Обработчики клика
+  leftArrow.addEventListener('click', () => updateImages(-1));
+  rightArrow.addEventListener('click', () => updateImages(1));
+})();
+</script>
+  </div>
+  <div data-layer="Rectangle 1" class="Rectangle1" style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute; background: #F2F2F2"></div>
+  <img data-layer="images/image-1-97.jpg"" class="Image1" style="width: 668px; height: 1001px; left: 1053px; top: 0px; position: absolute" src="главная.jpg" />
+  <div data-svg-wrapper data-layer="Vector 1" class="Vector1" style="left: 733px; top: -213px; position: absolute">
+    <svg width="1089" height="1061" viewBox="0 0 1089 1061" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M191.982 1047C436.069 1193.12 286.186 88.7844 872.287 -8.88634C1458.39 -106.557 711.489 -389.47 283.408 -50.2045C-144.673 289.062 -9.08835 926.634 191.982 1047Z" fill="#F2F2F2" stroke="#F2F2F2"/>
+    </svg>
+  </div>
+  <div data-svg-wrapper data-layer="Vector 2" class="Vector2" style="left: 800px; top: -177px; position: absolute">
+    <svg width="1088" height="1097" viewBox="0 0 1088 1097" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M190.982 1083C435.069 1229.12 285.186 124.784 871.287 27.1137C1457.39 -70.557 710.489 -353.47 282.408 -14.2045C-145.673 325.062 -10.0884 962.634 190.982 1083Z" fill="#F2F2F2" fill-opacity="0.5"/>
+    </svg>
+  </div>
+  <div data-layer="Rectangle 2" class="Rectangle2" style="width: 790px; height: 120px; left: 932px; top: 963px; position: absolute; background: white"></div>
+  <div data-layer="Честные условия аренды" style="width: 210px; left: 980px; top: 997px; position: absolute; color: #383838; font-size: 25px; font-family: Playfair Display; font-weight: 400; line-height: 30px; word-wrap: break-word">Честные условия аренды</div>
+  <div data-layer="Арендуйте офис на несколько месяцев или несколько лет без долгосрочных обязательств и комиссий" style="width: 333px; left: 1260px; top: 997px; position: absolute; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word">Арендуйте офис на несколько месяцев или несколько лет без долгосрочных обязательств и комиссий</div>
+  <div data-layer="iconlogo" class="Iconlogo" style="width: 117px; height: 22px; left: 153px; top: 80px; position: absolute; overflow: hidden">
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 0.71px; top: 6.13px; position: absolute">
+      <svg width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9.44303 3.57608C8.30436 3.59475 7.28703 3.81875 6.39103 4.24812C5.49503 4.65872 4.85103 5.28412 4.45903 6.12412V15.0001H0.707031V0.32808H4.15103V3.46408C4.41236 2.96008 4.72036 2.51208 5.07503 2.12008C5.4297 1.70941 5.81236 1.35475 6.22303 1.05608C6.6337 0.75741 7.04436 0.53341 7.45503 0.38408C7.88436 0.21608 8.29503 0.13208 8.68703 0.13208C8.89237 0.13208 9.0417 0.13208 9.13503 0.13208C9.24703 0.13208 9.3497 0.14141 9.44303 0.16008V3.57608Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 10.15px; top: 6.08px; position: absolute">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.88095 15.2801C6.70495 15.2801 5.64095 15.0841 4.68895 14.6921C3.73695 14.2814 2.92495 13.7307 2.25295 13.0401C1.58095 12.3494 1.05825 11.5467 0.684955 10.6321C0.330255 9.71739 0.152954 8.75609 0.152954 7.74809C0.152954 6.70269 0.330255 5.72269 0.684955 4.80809C1.03955 3.87472 1.55295 3.06271 2.22495 2.37205C2.89695 1.66271 3.70895 1.10272 4.66095 0.69205C5.63155 0.28138 6.71425 0.0760498 7.90895 0.0760498C9.10355 0.0760498 10.1676 0.28138 11.101 0.69205C12.053 1.10272 12.8556 1.65338 13.509 2.34405C14.181 3.03472 14.685 3.83738 15.021 4.75209C15.3756 5.66669 15.553 6.61869 15.553 7.60809C15.553 7.85069 15.5436 8.08409 15.525 8.30809C15.525 8.53209 15.5063 8.71869 15.469 8.86809H4.12895C4.18495 9.44669 4.32495 9.96009 4.54895 10.4081C4.77295 10.8561 5.06225 11.2387 5.41695 11.5561C5.77155 11.8734 6.17295 12.1161 6.62095 12.2841C7.06895 12.4521 7.53555 12.5361 8.02096 12.5361C8.76756 12.5361 9.46755 12.3587 10.121 12.0041C10.793 11.6307 11.2503 11.1454 11.493 10.5481L14.713 11.4441C14.1716 12.5641 13.3036 13.4881 12.109 14.2161C10.933 14.9254 9.52355 15.2801 7.88095 15.2801ZM11.689 6.43209C11.5956 5.33069 11.185 4.45339 10.457 3.80005C9.74755 3.12805 8.87955 2.79205 7.85295 2.79205C7.34895 2.79205 6.87295 2.88538 6.42495 3.07205C5.99555 3.24005 5.61295 3.48272 5.27695 3.80005C4.94095 4.11739 4.66095 4.50009 4.43695 4.94809C4.23155 5.39609 4.11025 5.89069 4.07295 6.43209H11.689Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 28.12px; top: 6.08px; position: absolute">
+      <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13.7547 15.0001H10.0027V6.76809C10.0027 5.59209 9.79735 4.73339 9.38665 4.19209C8.97595 3.65071 8.40665 3.38005 7.67865 3.38005C7.30535 3.38005 6.92265 3.45472 6.53065 3.60405C6.13865 3.75338 5.76535 3.96805 5.41065 4.24809C5.07465 4.50939 4.76665 4.82669 4.48665 5.20009C4.20665 5.57339 4.00135 5.98409 3.87065 6.43209V15.0001H0.118652V0.32805H3.50665V3.04405C4.04795 2.11072 4.83195 1.38272 5.85865 0.86005C6.88535 0.33738 8.04265 0.0760498 9.33065 0.0760498C10.2454 0.0760498 10.992 0.24405 11.5707 0.58005C12.1494 0.91605 12.5974 1.35472 12.9147 1.89605C13.232 2.43738 13.4467 3.05338 13.5587 3.74405C13.6894 4.43469 13.7547 5.13469 13.7547 5.84409V15.0001Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 44.07px; top: 1.57px; position: absolute">
+      <svg width="10" height="21" viewBox="0 0 10 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9.95236 19.2442C9.44836 19.4682 8.83236 19.6922 8.10436 19.9162C7.37636 20.1402 6.61106 20.2522 5.80836 20.2522C5.28566 20.2522 4.79106 20.1868 4.32436 20.0562C3.87636 19.9255 3.47506 19.7202 3.12036 19.4402C2.78436 19.1415 2.51366 18.7682 2.30836 18.3202C2.10306 17.8535 2.00036 17.2935 2.00036 16.6402V8.21212H0.0683594V5.32812H2.00036V0.568115H5.75236V5.32812H8.83236V8.21212H5.75236V15.3802C5.75236 15.9028 5.88306 16.2762 6.14436 16.5002C6.42436 16.7055 6.76036 16.8082 7.15236 16.8082C7.54436 16.8082 7.92706 16.7428 8.30036 16.6122C8.67366 16.4815 8.97236 16.3695 9.19636 16.2762L9.95236 19.2442Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 56.19px; top: 0.56px; position: absolute">
+      <svg width="4" height="21" viewBox="0 0 4 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.186401 21.0001V6.32806H3.9384V21.0001H0.186401ZM0.186401 4.28406V0.560059H3.9384V4.28406H0.186401Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 62.76px; top: 0.98px; position: absolute">
+      <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.4511 21.1401C8.99506 21.1401 7.66976 20.8601 6.47506 20.3001C5.29906 19.7214 4.28177 18.9654 3.42307 18.0321C2.58307 17.0801 1.92976 15.9974 1.46306 14.7841C0.996462 13.5707 0.763062 12.3294 0.763062 11.0601C0.763062 9.73477 1.00576 8.46543 1.49106 7.2521C1.99506 6.03876 2.67646 4.96543 3.53506 4.0321C4.41246 3.09877 5.44846 2.36143 6.64306 1.8201C7.83776 1.2601 9.13507 0.980103 10.5351 0.980103C11.9725 0.980103 13.2791 1.27877 14.4551 1.8761C15.6498 2.45477 16.6671 3.2201 17.5071 4.1721C18.3471 5.1241 19.0005 6.20677 19.4671 7.4201C19.9338 8.63343 20.1671 9.86543 20.1671 11.1161C20.1671 12.4414 19.9245 13.7107 19.4391 14.9241C18.9538 16.1187 18.2818 17.1827 17.4231 18.1161C16.5645 19.0307 15.5378 19.7681 14.3431 20.3281C13.1485 20.8694 11.8511 21.1401 10.4511 21.1401ZM4.68306 11.0601C4.68306 11.9187 4.81377 12.7494 5.07507 13.5521C5.33647 14.3547 5.70976 15.0641 6.19506 15.6801C6.69906 16.2961 7.30576 16.7907 8.01506 17.1641C8.74306 17.5374 9.56446 17.7241 10.4791 17.7241C11.4125 17.7241 12.2338 17.5374 12.9431 17.1641C13.6711 16.7721 14.2778 16.2587 14.7631 15.6241C15.2671 14.9894 15.6405 14.2801 15.8831 13.4961C16.1445 12.6934 16.2751 11.8814 16.2751 11.0601C16.2751 10.2014 16.1351 9.37076 15.8551 8.5681C15.5938 7.76543 15.2111 7.0561 14.7071 6.4401C14.2218 5.8241 13.6151 5.33876 12.8871 4.9841C12.1778 4.61077 11.3751 4.4241 10.4791 4.4241C9.54576 4.4241 8.71506 4.6201 7.98706 5.0121C7.25906 5.38543 6.65246 5.88943 6.16706 6.5241C5.68176 7.1401 5.30846 7.84943 5.04706 8.6521C4.80446 9.4361 4.68306 10.2387 4.68306 11.0601Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 85.05px; top: 6.08px; position: absolute">
+      <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13.6832 15.0001H9.93124V6.76809C9.93124 5.59209 9.72594 4.73339 9.31524 4.19209C8.90454 3.65071 8.33524 3.38005 7.60724 3.38005C7.23394 3.38005 6.85124 3.45472 6.45924 3.60405C6.06724 3.75338 5.69394 3.96805 5.33924 4.24809C5.00324 4.50939 4.69524 4.82669 4.41524 5.20009C4.13524 5.57339 3.92994 5.98409 3.79924 6.43209V15.0001H0.0472412V0.32805H3.43524V3.04405C3.97654 2.11072 4.76054 1.38272 5.78724 0.86005C6.81394 0.33738 7.97124 0.0760498 9.25924 0.0760498C10.1739 0.0760498 10.9205 0.24405 11.4992 0.58005C12.0779 0.91605 12.5259 1.35472 12.8432 1.89605C13.1605 2.43738 13.3752 3.05338 13.4872 3.74405C13.6179 4.43469 13.6832 5.13469 13.6832 5.84409V15.0001Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 101.30px; top: 6.08px; position: absolute">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8.03 15.2801C6.854 15.2801 5.79 15.0841 4.838 14.6921C3.886 14.2814 3.074 13.7307 2.402 13.0401C1.73 12.3494 1.207 11.5467 0.834 10.6321C0.479 9.71739 0.302002 8.75609 0.302002 7.74809C0.302002 6.70269 0.479 5.72269 0.834 4.80809C1.188 3.87472 1.702 3.06271 2.374 2.37205C3.046 1.66271 3.858 1.10272 4.81 0.69205C5.78 0.28138 6.863 0.0760498 8.058 0.0760498C9.252 0.0760498 10.316 0.28138 11.25 0.69205C12.202 1.10272 13.004 1.65338 13.658 2.34405C14.33 3.03472 14.834 3.83738 15.17 4.75209C15.524 5.66669 15.702 6.61869 15.702 7.60809C15.702 7.85069 15.692 8.08409 15.674 8.30809C15.674 8.53209 15.655 8.71869 15.618 8.86809H4.278C4.334 9.44669 4.474 9.96009 4.698 10.4081C4.922 10.8561 5.211 11.2387 5.566 11.5561C5.92 11.8734 6.322 12.1161 6.77 12.2841C7.218 12.4521 7.684 12.5361 8.17 12.5361C8.916 12.5361 9.616 12.3587 10.27 12.0041C10.942 11.6307 11.399 11.1454 11.642 10.5481L14.862 11.4441C14.32 12.5641 13.452 13.4881 12.258 14.2161C11.082 14.9254 9.672 15.2801 8.03 15.2801ZM11.838 6.43209C11.744 5.33069 11.334 4.45339 10.606 3.80005C9.896 3.12805 9.028 2.79205 8.002 2.79205C7.498 2.79205 7.022 2.88538 6.574 3.07205C6.144 3.24005 5.762 3.48272 5.426 3.80005C5.09 4.11739 4.81 4.50009 4.586 4.94809C4.38 5.39609 4.259 5.89069 4.222 6.43209H11.838Z" fill="#383838"/>
+      </svg>
+    </div>
+    <div data-svg-wrapper data-layer="Vector" class="Vector" style="left: 101.50px; top: 0px; position: absolute">
+      <svg width="16" height="3" viewBox="0 0 16 3" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0.5 0H15.5V3H0.5V0Z" fill="#383838"/>
+      </svg>
+    </div>
+  </div>
+  <div data-layer="Frame 1" class="Frame1" style="height: 42px; left: 387px; top: 81px; position: absolute; justify-content: flex-start; align-items: flex-start; gap: 60px; display: inline-flex">
+    <a href="Пофис.html" data-layer="Популярные офисы" style="color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word; text-decoration: none">Популярные офисы</a>
+<a href="онас.html" data-layer="О компании" style="color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word; text-decoration: none">О компании</a>
+<a href="#office-showreel" 
+   onclick="smoothScroll(event)" 
+   data-layer="Шоурил офисов" 
+   style="display: inline-block; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; text-decoration: none; margin-right: 20px;">
+  Шоурил офисов
+</a><a href="контакт.html" data-layer="Контакты" style="color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word; text-decoration: none">Контакты</a>
+  </div>
+  <div data-layer="Новости" style="left: 427px; top: 819px; position: absolute; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 700; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word">Новости</div>
+  <div data-layer="Аренда офисов в Самаре" style="width: 651px; left: 427px; top: 371px; position: absolute; color: #383838; font-size: 85px; font-family: Playfair Display; font-weight: 400; line-height: 96px; word-wrap: break-word">Аренда офисов в Самаре</div>
+  <div data-layer="#1 СРЕДИ БРОКЕРОВ SMR" class="49Smr" style="left: 427px; top: 311px; position: absolute; opacity: 0.50; color: #383838; font-size: 15px; font-family: Open Sans; font-weight: 400; text-transform: uppercase; letter-spacing: 0.75px; word-wrap: break-word">#1 СРЕДИ БРОКЕРОВ SMR</div>
+<a href="3page.html" data-layer="Перейти в каталог" style="left: 427px; top: 617px; position: absolute; color: #383838; font-size: 18px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.18px; word-wrap: break-word; text-decoration: none">Перейти в каталог</a>
+  <div data-svg-wrapper data-layer="Ellipse 1" class="Ellipse1" style="left: 679px; top: 603px; position: absolute">
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="28" r="28" fill="#E9B0B0"/>
+    </svg>
+  </div>
+  <div data-svg-wrapper data-layer="Arrow 1" class="Arrow1" style="left: 622px; top: 620px; position: absolute">
+    <svg width="87" height="24" viewBox="0 0 87 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M86.0607 13.0607C86.6464 12.4749 86.6464 11.5251 86.0607 10.9393L76.5147 1.3934C75.9289 0.807611 74.9792 0.807611 74.3934 1.3934C73.8076 1.97919 73.8076 2.92893 74.3934 3.51472L82.8787 12L74.3934 20.4853C73.8076 21.0711 73.8076 22.0208 74.3934 22.6066C74.9792 23.1924 75.9289 23.1924 76.5147 22.6066L86.0607 13.0607ZM0 13.5H85V10.5H0V13.5Z" fill="#383838"/>
+    </svg>
+  </div>
+  <div data-layer="Мы в соцсетях" style="left: 149px; top: 528.04px; position: absolute; transform: rotate(-90deg); transform-origin: top left; color: #A0A0A0; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word">Мы в соцсетях</div>
+  <div data-svg-wrapper data-layer="iconVK" class="Iconvk" style="left: 149px; top: 814px; position: absolute">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.8939 15.8373C20.8697 15.7824 20.8471 15.7369 20.8261 15.7003C20.4791 15.0432 19.8161 14.2364 18.8372 13.2801L18.8165 13.2581L18.8063 13.2475L18.7957 13.2364H18.7852C18.3409 12.7911 18.0596 12.4916 17.9418 12.3384C17.7264 12.0463 17.678 11.7507 17.7958 11.4512C17.8791 11.2249 18.1917 10.747 18.733 10.0168C19.0177 9.62986 19.2432 9.31972 19.4098 9.08606C20.6109 7.40686 21.1316 6.33383 20.9719 5.86655L20.9098 5.75735C20.8681 5.69161 20.7605 5.63147 20.5871 5.57662C20.4134 5.52189 20.1913 5.51284 19.9206 5.54931L16.9217 5.57109C16.8731 5.55299 16.8036 5.55468 16.7133 5.57662C16.6231 5.59856 16.5779 5.60956 16.5779 5.60956L16.5257 5.63699L16.4843 5.66994C16.4495 5.69173 16.4113 5.73004 16.3696 5.78482C16.3281 5.83939 16.2936 5.90345 16.2657 5.97643C15.9392 6.85979 15.5681 7.6811 15.1514 8.4403C14.8946 8.89301 14.6587 9.28535 14.4433 9.6175C14.228 9.94965 14.0475 10.1943 13.9018 10.3512C13.7559 10.5081 13.6243 10.6339 13.506 10.7289C13.3881 10.824 13.298 10.864 13.2355 10.8493C13.1729 10.8348 13.1141 10.8202 13.0583 10.8056C12.9612 10.7398 12.883 10.6504 12.8241 10.5372C12.765 10.4241 12.7251 10.2817 12.7044 10.1101C12.6835 9.93841 12.6714 9.79076 12.6679 9.6666C12.6646 9.54267 12.6661 9.36725 12.6732 9.14094C12.6804 8.91453 12.6835 8.76133 12.6835 8.68103C12.6835 8.40356 12.6887 8.10243 12.699 7.77757C12.7096 7.45269 12.7181 7.1953 12.7251 7.00566C12.7322 6.81583 12.7355 6.61502 12.7355 6.4033C12.7355 6.19157 12.7232 6.02553 12.699 5.90502C12.6752 5.78466 12.6384 5.66783 12.59 5.55457C12.5413 5.44142 12.4701 5.35389 12.3766 5.29175C12.2829 5.2297 12.1663 5.18045 12.0277 5.14386C11.6598 5.05629 11.1911 5.00892 10.6218 5.00156C9.33065 4.98698 8.50102 5.07466 8.13308 5.26449C7.9873 5.34469 7.85538 5.45427 7.73743 5.59288C7.61244 5.75355 7.59501 5.84124 7.68524 5.85565C8.10183 5.92128 8.39674 6.07827 8.57032 6.32647L8.63287 6.45799C8.68152 6.55287 8.7301 6.72088 8.77872 6.96174C8.82726 7.20261 8.8586 7.46907 8.87237 7.76095C8.90703 8.29397 8.90703 8.75025 8.87237 9.12982C8.83762 9.50949 8.8048 9.80512 8.77347 10.0169C8.74214 10.2286 8.6953 10.4002 8.63287 10.5316C8.57032 10.6629 8.5287 10.7432 8.50784 10.7724C8.487 10.8016 8.46965 10.82 8.45586 10.8271C8.36563 10.8635 8.27179 10.882 8.17466 10.882C8.07739 10.882 7.95944 10.8309 7.82062 10.7285C7.68185 10.6263 7.53783 10.4859 7.38853 10.307C7.23925 10.128 7.07091 9.87806 6.88339 9.55682C6.69603 9.23564 6.50163 8.85603 6.30031 8.41802L6.13374 8.10036C6.02961 7.896 5.88737 7.59844 5.70687 7.20795C5.52626 6.8173 5.36662 6.43942 5.22784 6.07439C5.17236 5.92108 5.08902 5.80437 4.97797 5.72405L4.92586 5.6911C4.8912 5.66196 4.83558 5.63101 4.75928 5.59802C4.68288 5.56507 4.60314 5.54145 4.51977 5.52691L1.66657 5.5487C1.37501 5.5487 1.17718 5.61816 1.07302 5.75689L1.03133 5.82252C1.0105 5.85906 1 5.91744 1 5.9978C1 6.07812 1.02083 6.17669 1.06251 6.2934C1.47903 7.32287 1.93198 8.31569 2.42137 9.27203C2.91076 10.2284 3.33602 10.9988 3.69691 11.5825C4.05788 12.1666 4.42582 12.7179 4.80071 13.236C5.17561 13.7544 5.42377 14.0866 5.54519 14.2326C5.66675 14.3788 5.76223 14.4881 5.83163 14.561L6.09202 14.8238C6.25862 14.9991 6.50327 15.209 6.8261 15.4535C7.14898 15.6981 7.50645 15.939 7.89868 16.1765C8.29096 16.4135 8.74736 16.6069 9.26806 16.7566C9.78871 16.9064 10.2955 16.9665 10.7884 16.9375H11.986C12.2288 16.9154 12.4128 16.8352 12.5378 16.6966L12.5792 16.6417C12.6072 16.598 12.6332 16.5304 12.6573 16.4392C12.6816 16.3481 12.6937 16.2475 12.6937 16.1382C12.6866 15.8243 12.7094 15.5413 12.7614 15.2896C12.8132 15.0378 12.8723 14.848 12.9385 14.7201C13.0047 14.5924 13.0792 14.4846 13.1623 14.3972C13.2456 14.3097 13.3049 14.2567 13.3397 14.2385C13.3742 14.2201 13.4018 14.2076 13.4227 14.2C13.5892 14.1417 13.7853 14.1983 14.0112 14.37C14.2368 14.5415 14.4486 14.7533 14.6465 15.0051C14.8444 15.2571 15.0821 15.5399 15.3596 15.8537C15.6375 16.1677 15.8804 16.4011 16.0885 16.5546L16.2968 16.686C16.4359 16.7736 16.6163 16.854 16.8386 16.927C17.0604 17 17.2547 17.0183 17.4214 16.9817L20.0871 16.938C20.3509 16.938 20.556 16.8921 20.7014 16.801C20.8473 16.7097 20.934 16.6092 20.9618 16.4999C20.9898 16.3905 20.9912 16.2662 20.9671 16.1274C20.9424 15.9888 20.9181 15.892 20.8939 15.8373Z" fill="#C3C3C3"/>
+    </svg>
+  </div>
+  <div data-svg-wrapper data-layer="iconYoutube" class="Iconyoutube" style="left: 150px; top: 775px; position: absolute">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.2204 5.28765C19.4985 4.37306 18.1656 4 15.6201 4H6.37975C3.77594 4 2.42045 4.39713 1.70123 5.37083C1 6.3202 1 7.71903 1 9.65503V13.345C1 17.0957 1.832 19 6.37975 19H15.6201C17.8276 19 19.0508 18.6709 19.8422 17.8637C20.6538 17.036 21 15.6847 21 13.345V9.65503C21 7.61335 20.9458 6.20628 20.2204 5.28765ZM13.8401 12.0095L9.64406 14.3465C9.55026 14.3988 9.44767 14.4247 9.34522 14.4247C9.22922 14.4247 9.11348 14.3914 9.01097 14.3253C8.81794 14.2006 8.70006 13.9777 8.70006 13.7371V9.07803C8.70006 8.83794 8.81761 8.61518 9.01026 8.49045C9.20297 8.36574 9.44264 8.35721 9.64258 8.4679L13.8386 10.7899C14.0521 10.908 14.1861 11.1429 14.1864 11.3991C14.1867 11.6556 14.0533 11.8908 13.8401 12.0095Z" fill="#C3C3C3"/>
+    </svg>
+  </div>
+  <div data-layer="Line 1" class="Line1" style="width: 234px; height: 0px; left: 161px; top: 534px; position: absolute; transform: rotate(90deg); transform-origin: top left; opacity: 0.50; outline: 1px black solid; outline-offset: -0.50px"></div>
+  <div data-layer="В наш портфель добавился новый офис «Газпром» с 37 офисами …" class="37" style="width: 254px; height: 66px; left: 580px; top: 819px; position: absolute; color: #383838; font-size: 16px; font-family: Open Sans; font-weight: 400; line-height: 24px; letter-spacing: 0.16px; word-wrap: break-word">В наш портфель добавился новый офис «Газпром» с 37 офисами …
+  <br/></div>
+  <div data-layer="Интервью Renti One в Forbes" class="RentiOneForbes" style="left: 1747px; top: 334.08px; position: absolute; transform: rotate(-90deg); transform-origin: top left; color: #A0A0A0; font-size: 15px; font-family: Open Sans; font-weight: 400; text-transform: uppercase; line-height: 24px; letter-spacing: 0.15px; word-wrap: break-word">Интервью Renti One в Forbes</div>
+  <div data-layer="Line 1" class="Line1" style="width: 234px; height: 0px; left: 1759px; top: 349px; position: absolute; transform: rotate(90deg); transform-origin: top left; opacity: 0.50; outline: 1px black solid; outline-offset: -0.50px"></div>
+<!-- Прогресс-бар -->
+<div id="progressBar" data-svg-wrapper data-layer="Vector 7" class="Vector7" 
+     style="left: 142.83px; top: 1480.98px; position: absolute; transition: transform 0.3s ease">
+  <svg width="160" height="3" viewBox="0 0 172 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0.832275 0.975586H171.369" stroke="black" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<script>
+(function() {
+  // Настройки
+  const totalSteps = 6; // Общее количество шагов
+  const stepSize = 70; // Пикселей на шаг
+  let currentStep = 0;
+
+  const progressBar = document.getElementById('progressBar');
+  const startY = 1503.98; // Исходная позиция Y
+
+  function moveProgress(direction) {
+    const newStep = currentStep + direction;
+    if(newStep < 0 || newStep >= totalSteps) return;
+    
+    currentStep = newStep;
+    progressBar.style.transform = `translateY(${currentStep * stepSize}px)`;
+  }
+
+  // Интеграция со стрелками
+  document.querySelector('.arrow-left').addEventListener('click', () => {
+    moveProgress(-1);
+    // updateImages(-1); // Раскомментировать если нужно синхронизировать с изображениями
+  });
+
+  document.querySelector('.arrow-right').addEventListener('click', () => {
+    moveProgress(1);
+    // updateImages(1); // Раскомментировать если нужно синхронизировать с изображениями
+  });
+})();
+</script>
+
+    </svg>
+  </div>
+</div>
+<!-- Форма для аренды офиса (улучшенная версия) -->
+
+<div id="rent-form" data-layer="Заявка на аренду офиса" 
+     style="left: 679px; top: 5066px; position: absolute;...">
+  
+</div>
+
+
+<!-- Поля формы -->
+
+
+<div id="rent-form" data-layer="Заявка на аренду офиса" style="left: 900px; top: 5166px; position: absolute; width: 500px;">
+  <div style="color: #383838; font-size: 50px; font-family: Playfair Display; font-weight: 400; line-height: 60px; margin-bottom: 40px;">
+    Заявка на аренду офиса
+  </div>
+
+  <!-- Форма с прямым подключением к Formspree -->
+  <form action="https://formspree.io/f/mrbkgzjd" method="POST">
+    <!-- Скрытые поля для настройки Formspree -->
+    <input type="hidden" name="_language" value="ru">
+    <input type="hidden" name="_subject" value="Новая заявка на аренду офиса">
+    <input type="hidden" name="_replyto" value="tvix2504@mail.ru">
+    <input type="hidden" name="_next" value="2page.html"> <!-- Перенаправление после отправки -->
+
+    <!-- Поля формы -->
+    <div style="margin-bottom: 20px;">
+      <label for="company-name" style="color: #383838; font-size: 20px; font-family: Open Sans; font-weight: 700; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+        Название компании:
+      </label>
+      <input type="text" id="company-name" name="company" required style="width: 100%; height: 40px; padding: 0 10px; border: 1px solid #000;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label for="contact-person" style="color: #383838; font-size: 20px; font-family: Open Sans; font-weight: 700; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+        Контактное лицо:
+      </label>
+      <input type="text" id="contact-person" name="name" required style="width: 100%; height: 40px; padding: 0 10px; border: 1px solid #000;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label for="contact-data" style="color: #383838; font-size: 20px; font-family: Open Sans; font-weight: 700; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+        Контактные данные:
+      </label>
+      <input type="text" id="contact-data" name="contact" required style="width: 100%; height: 40px; padding: 0 10px; border: 1px solid #000;">
+    </div>
+
+    <div style="margin-bottom: 20px; display: flex; align-items: center;">
+      <label for="floor" style="color: #383838; font-size: 20px; font-family: Open Sans; font-weight: 700; letter-spacing: 1px; margin-right: 15px;">
+        Этаж:
+      </label>
+      <input type="number" id="floor" name="floor" min="1" required style="width: 80px; height: 40px; padding: 0 10px; border: 1px solid #000;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label for="office-number" style="color: #383838; font-size: 20px; font-family: Open Sans; font-weight: 700; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+        Номер офиса:
+      </label>
+      <input type="text" id="office-number" name="office" required style="width: 100%; height: 40px; padding: 0 10px; border: 1px solid #000;">
+    </div>
+
+    <div style="margin-bottom: 30px;">
+      <label for="comment" style="color: #383838; font-size: 20px; font-family: Open Sans; font-weight: 700; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+        Комментарий:
+      </label>
+      <textarea id="comment" name="message" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #000; resize: vertical;"></textarea>
+    </div>
+
+    <!-- Кнопка отправки -->
+    <div style="text-align: center;">
+      <button type="submit" style="width: 220px; height: 50px; background: #ECECEC; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); border-radius: 41px; border: 1px black solid; color: black; font-size: 20px; font-family: Open Sans; font-weight: 600; letter-spacing: 0.95px; cursor: pointer;">
+        Отправить заявку
+        <input type="hidden" name="_next" value="2page.html">
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Простой скрипт для улучшения UX -->
+<script>
+  document.querySelector('form').addEventListener('submit', function() {
+    const button = this.querySelector('button[type="submit"]');
+    button.disabled = true;
+    button.textContent = 'Отправка...';
+    button.style.opacity = '0.7';
+  });
+</script>
+
+
+
+
+<!-- Всплывающее окно чата -->
+    <div class="chat-popup" id="chatPopup">
+        <div class="chat-header">
+            <div class="manager-avatar">М</div>
+            <div class="manager-info">
+                <div class="manager-name">Менеджер Ирина</div>
+                <div class="manager-status">Online</div>
+            </div>
+            <button class="close-btn" id="closeBtn">×</button>
+        </div>
+        <div class="chat-body">
+            <div class="manager-message">
+                Здравствуйте! Предлагаю помощь. Чем могу помочь?
+            </div>
+            <textarea class="user-input" id="userMessage" placeholder="Напишите ваш вопрос..."></textarea>
+            <button class="send-btn" id="sendBtn">Отправить</button>
+        </div>
+    </div>
+    
+    <!-- Уведомление об отправке -->
+    <div class="notification" id="notification">Сообщение отправлено!</div>
+    
+    <script>
+        // Показываем всплывающее окно через 10 секунд
+        setTimeout(() => {
+            document.getElementById('chatPopup').classList.add('visible');
+        }, 10000);
+        
+        // Закрытие окна
+        document.getElementById('closeBtn').addEventListener('click', function() {
+            document.getElementById('chatPopup').classList.remove('visible');
+        });
+        
+        // Отправка сообщения
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const message = document.getElementById('userMessage').value;
+            if (message.trim() !== '') {
+                // Здесь можно добавить логику отправки сообщения на сервер
+                
+                // Показываем уведомление
+                const notification = document.getElementById('notification');
+                notification.style.display = 'block';
+                notification.textContent = 'Сообщение отправлено!';
+                
+                // Скрываем уведомление через 3 секунды
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+                
+                // Очищаем поле ввода
+                document.getElementById('userMessage').value = '';
+                
+                // Закрываем окно через 1 секунду
+                setTimeout(() => {
+                    document.getElementById('chatPopup').classList.remove('visible');
+                }, 1000);
+            }
+        });
+        
+        // Отправка сообщения при нажатии Enter
+        document.getElementById('userMessage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('sendBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
+
